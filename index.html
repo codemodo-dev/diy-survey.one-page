@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DIY Survey & Panel Platform — Docs</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #0d1117;
+        --ink2: #3a4250;
+        --ink3: #6b7585;
+        --rule: #e4e8ee;
+        --bg: #f7f8fa;
+        --white: #ffffff;
+        --teal: #00b896;
+        --teal-light: #e6faf6;
+        --blue: #1a56db;
+        --blue-light: #eff4ff;
+        --sidebar-w: 248px;
+        --header-h: 54px;
+      }
+
+      html,
+      body {
+        height: 100%;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      /* ── LAYOUT ── */
+      .layout {
+        display: grid;
+        grid-template-columns: var(--sidebar-w) 1fr;
+        grid-template-rows: var(--header-h) 1fr;
+        height: 100vh;
+      }
+
+      /* ── HEADER ── */
+      header {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 28px;
+        background: var(--white);
+        border-bottom: 2px solid var(--ink);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+      }
+      .header-eyebrow {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+      .header-divider {
+        width: 1px;
+        height: 18px;
+        background: var(--rule);
+      }
+      .header-title {
+        font-family: "DM Serif Display", serif;
+        font-size: 19px;
+        line-height: 1;
+        color: var(--ink);
+      }
+      .header-title em {
+        font-style: italic;
+        color: var(--teal);
+      }
+      .header-sep {
+        flex: 1;
+      }
+      .meta-pill {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 50px;
+        white-space: nowrap;
+      }
+      .meta-pill.dark {
+        background: var(--ink);
+        color: #fff;
+      }
+      .meta-pill.teal {
+        background: var(--teal);
+        color: #fff;
+      }
+
+      /* ── SIDEBAR ── */
+      aside {
+        border-right: 1px solid var(--rule);
+        background: var(--white);
+        overflow-y: auto;
+        padding: 22px 0 32px;
+      }
+      aside::-webkit-scrollbar {
+        width: 3px;
+      }
+      aside::-webkit-scrollbar-thumb {
+        background: var(--rule);
+      }
+
+      .nav-section-label {
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--ink3);
+        padding: 0 20px;
+        margin: 20px 0 6px;
+      }
+      .nav-section-label:first-child {
+        margin-top: 0;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 20px;
+        cursor: pointer;
+        color: var(--ink2);
+        font-size: 13px;
+        font-weight: 400;
+        border-left: 2px solid transparent;
+        transition:
+          background 0.12s,
+          color 0.12s;
+        user-select: none;
+      }
+      .nav-item:hover {
+        color: var(--ink);
+        background: var(--bg);
+      }
+      .nav-item.active {
+        color: var(--teal);
+        background: var(--teal-light);
+        border-left-color: var(--teal);
+        font-weight: 500;
+      }
+      .nav-item .nav-ico {
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .nav-item .nav-label {
+        flex: 1;
+      }
+      .nav-item .nav-badge {
+        font-size: 9px;
+        font-weight: 600;
+        color: var(--ink3);
+        background: var(--bg);
+        border: 1px solid var(--rule);
+        padding: 1px 6px;
+        border-radius: 3px;
+      }
+      .nav-item.active .nav-badge {
+        color: var(--teal);
+        background: var(--teal-light);
+        border-color: rgba(0, 184, 150, 0.3);
+      }
+
+      /* ── MAIN ── */
+      main {
+        overflow-y: auto;
+        background: var(--bg);
+      }
+      main::-webkit-scrollbar {
+        width: 4px;
+      }
+      main::-webkit-scrollbar-thumb {
+        background: var(--rule);
+      }
+
+      .content-area {
+        display: none;
+      }
+      .content-area.active {
+        display: block;
+      }
+
+      .content-inner {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 44px 52px 60px;
+      }
+
+      /* ── LOADING ── */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 200px;
+        color: var(--ink3);
+        font-size: 13px;
+      }
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--rule);
+        border-top-color: var(--teal);
+        border-radius: 50%;
+        animation: spin 0.55s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── WELCOME ── */
+      .welcome {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 44px 52px 60px;
+      }
+      .welcome .eyebrow {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 12px;
+      }
+      .welcome h1 {
+        font-family: "DM Serif Display", serif;
+        font-size: 42px;
+        line-height: 1.05;
+        color: var(--ink);
+        margin-bottom: 12px;
+      }
+      .welcome h1 em {
+        font-style: italic;
+        color: var(--teal);
+      }
+      .welcome .w-rule {
+        height: 2px;
+        background: var(--ink);
+        margin-bottom: 20px;
+      }
+      .welcome .sub {
+        font-size: 14px;
+        color: var(--ink3);
+        line-height: 1.7;
+        max-width: 460px;
+        margin-bottom: 36px;
+      }
+
+      .welcome-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .welcome-card {
+        background: var(--white);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 18px;
+        cursor: pointer;
+        transition: all 0.15s;
+        position: relative;
+        overflow: hidden;
+      }
+      .welcome-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--teal);
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      .welcome-card:hover {
+        border-color: rgba(0, 184, 150, 0.35);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        transform: translateY(-1px);
+      }
+      .welcome-card:hover::before {
+        opacity: 1;
+      }
+      .welcome-card .wc-ico {
+        font-size: 18px;
+        margin-bottom: 10px;
+        display: block;
+      }
+      .welcome-card .wc-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 2px;
+      }
+      .welcome-card .wc-file {
+        font-size: 11px;
+        color: var(--ink3);
+      }
+
+      .welcome-html-row {
+        display: flex;
+        gap: 12px;
+      }
+      .welcome-html-card {
+        flex: 1;
+        background: var(--blue-light);
+        border: 1px solid rgba(26, 86, 219, 0.15);
+        border-radius: 10px;
+        padding: 14px 18px;
+        cursor: pointer;
+        transition: all 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .welcome-html-card:hover {
+        border-color: rgba(26, 86, 219, 0.35);
+        transform: translateY(-1px);
+      }
+      .welcome-html-card .wc-ico {
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .welcome-html-card .wc-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--blue);
+      }
+      .welcome-html-card .wc-file {
+        font-size: 11px;
+        color: #5a7ab8;
+      }
+      .wc-arrow {
+        margin-left: auto;
+        font-size: 13px;
+        color: var(--blue);
+        opacity: 0.45;
+      }
+
+      /* ── MARKDOWN STYLES ── */
+      .md-body {
+        animation: fadeUp 0.2s ease;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .doc-meta {
+        padding-bottom: 24px;
+        border-bottom: 2px solid var(--ink);
+        margin-bottom: 32px;
+      }
+      .doc-eyebrow {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 10px;
+      }
+      .doc-title {
+        font-family: "DM Serif Display", serif;
+        font-size: 34px;
+        font-weight: 400;
+        line-height: 1.1;
+        color: var(--ink);
+      }
+
+      .md-body h1 {
+        font-family: "DM Serif Display", serif;
+        font-size: 32px;
+        font-weight: 400;
+        color: var(--ink);
+        line-height: 1.1;
+        padding-bottom: 16px;
+        border-bottom: 2px solid var(--ink);
+        margin-bottom: 28px;
+      }
+      .md-body h2 {
+        font-family: "DM Serif Display", serif;
+        font-size: 22px;
+        font-weight: 400;
+        color: var(--ink);
+        margin: 38px 0 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .md-body h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        margin: 26px 0 10px;
+      }
+      .md-body h4 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink2);
+        margin: 18px 0 8px;
+      }
+      .md-body p {
+        margin-bottom: 14px;
+        color: var(--ink2);
+        line-height: 1.75;
+      }
+      .md-body ul,
+      .md-body ol {
+        margin: 8px 0 14px 22px;
+      }
+      .md-body li {
+        margin-bottom: 5px;
+        color: var(--ink2);
+        line-height: 1.65;
+      }
+      .md-body strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .md-body em {
+        color: var(--teal);
+      }
+      .md-body a {
+        color: var(--blue);
+        text-decoration: none;
+      }
+      .md-body a:hover {
+        text-decoration: underline;
+      }
+
+      .md-body code {
+        font-size: 12px;
+        background: var(--teal-light);
+        color: #007a62;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-family: "SFMono-Regular", "Consolas", "Menlo", monospace;
+      }
+      .md-body pre {
+        background: var(--ink);
+        border-radius: 8px;
+        padding: 18px 20px;
+        overflow-x: auto;
+        margin: 14px 0 18px;
+      }
+      .md-body pre code {
+        background: none;
+        color: #c9d1d9;
+        padding: 0;
+        font-size: 13px;
+        line-height: 1.65;
+      }
+      .md-body blockquote {
+        border-left: 3px solid var(--teal);
+        padding: 12px 18px;
+        margin: 14px 0;
+        background: var(--teal-light);
+        border-radius: 0 6px 6px 0;
+        color: var(--ink3);
+      }
+      .md-body hr {
+        border: none;
+        border-top: 1px solid var(--rule);
+        margin: 28px 0;
+      }
+
+      /* ── TABLES ── */
+      .md-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14px 0 24px;
+        font-size: 13px;
+        background: var(--white);
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .md-body thead tr {
+        background: var(--ink);
+      }
+      .md-body th {
+        text-align: left;
+        padding: 10px 14px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .md-body td {
+        padding: 9px 14px;
+        border-bottom: 1px solid var(--rule);
+        color: var(--ink2);
+        vertical-align: top;
+        line-height: 1.55;
+      }
+      .md-body tbody tr:last-child td {
+        border-bottom: none;
+      }
+      .md-body tbody tr:hover td {
+        background: var(--bg);
+      }
+      .md-body td strong {
+        color: var(--ink);
+      }
+      .md-body td code {
+        font-size: 11.5px;
+      }
+
+      /* ── ERROR ── */
+      .error-box {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        border-radius: 8px;
+        padding: 18px 20px;
+        margin-top: 20px;
+      }
+      .error-box h3 {
+        color: #b91c1c;
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      .error-box p {
+        color: #7f1d1d;
+        font-size: 13px;
+      }
+      .error-box code {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- HEADER -->
+      <header>
+        <div class="header-eyebrow">Docs</div>
+        <div class="header-divider"></div>
+        <div class="header-title">DIY Survey &amp; <em>Panel</em> Platform</div>
+        <div class="header-sep"></div>
+        <div class="meta-pill teal">MVP · Rp 390 jt</div>
+        <div class="meta-pill dark">15–18 Bulan</div>
+      </header>
+
+      <!-- SIDEBAR -->
+      <aside>
+        <div class="nav-section-label">Overview</div>
+        <div
+          class="nav-item active"
+          data-page="welcome"
+          onclick="showWelcome(this)"
+        >
+          <span class="nav-ico">🏠</span>
+          <span class="nav-label">Home</span>
+        </div>
+
+        <div class="nav-section-label">Documents</div>
+        <div
+          class="nav-item"
+          data-key="proposal"
+          onclick="loadMd('proposal', this)"
+        >
+          <span class="nav-ico">📄</span>
+          <span class="nav-label">Proposal</span>
+          <span class="nav-badge">.md</span>
+        </div>
+        <div class="nav-item" data-key="sow" onclick="loadMd('sow', this)">
+          <span class="nav-ico">📋</span>
+          <span class="nav-label">Scope of Work</span>
+          <span class="nav-badge">.md</span>
+        </div>
+        <div
+          class="nav-item"
+          data-key="timeline"
+          onclick="loadMd('timeline', this)"
+        >
+          <span class="nav-ico">📅</span>
+          <span class="nav-label">Timeline</span>
+          <span class="nav-badge">.md</span>
+        </div>
+        <div
+          class="nav-item"
+          data-key="pricing"
+          onclick="loadMd('pricing', this)"
+        >
+          <span class="nav-ico">💰</span>
+          <span class="nav-label">Pricing</span>
+          <span class="nav-badge">.md</span>
+        </div>
+        <div
+          class="nav-item"
+          data-key="stack_tech"
+          onclick="loadMd('stack_tech', this)"
+        >
+          <span class="nav-ico">⚙️</span>
+          <span class="nav-label">Tech Stack</span>
+          <span class="nav-badge">.md</span>
+        </div>
+
+        <div class="nav-section-label">Presentations</div>
+        <div class="nav-item" onclick="window.open('one_page.html', '_blank')">
+          <span class="nav-ico">🗂️</span>
+          <span class="nav-label">One Page Summary</span>
+          <span class="nav-badge">↗</span>
+        </div>
+        <div
+          class="nav-item"
+          onclick="window.open('deck_presentation.html', '_blank')"
+        >
+          <span class="nav-ico">🎞️</span>
+          <span class="nav-label">Presentation Deck</span>
+          <span class="nav-badge">↗</span>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main id="main">
+        <!-- WELCOME -->
+        <div class="content-area active" id="page-welcome">
+          <div class="welcome">
+            <div class="eyebrow">
+              Project Documentation · v1.0.0 · 27 Februari 2026
+            </div>
+            <h1>DIY Survey<br />&amp; <em>Panel</em> Platform</h1>
+            <div class="w-rule"></div>
+            <p class="sub">
+              Dokumentasi lengkap pengembangan platform survei mandiri berbasis
+              web — mulai dari proposal, scope, timeline, hingga pricing dan
+              tech stack.
+            </p>
+
+            <div class="welcome-grid">
+              <div
+                class="welcome-card"
+                onclick="loadMd('proposal', navFor('proposal'))"
+              >
+                <span class="wc-ico">📄</span>
+                <div class="wc-name">Proposal</div>
+                <div class="wc-file">proposal.md</div>
+              </div>
+              <div class="welcome-card" onclick="loadMd('sow', navFor('sow'))">
+                <span class="wc-ico">📋</span>
+                <div class="wc-name">Scope of Work</div>
+                <div class="wc-file">sow.md</div>
+              </div>
+              <div
+                class="welcome-card"
+                onclick="loadMd('timeline', navFor('timeline'))"
+              >
+                <span class="wc-ico">📅</span>
+                <div class="wc-name">Timeline</div>
+                <div class="wc-file">timeline.md</div>
+              </div>
+              <div
+                class="welcome-card"
+                onclick="loadMd('pricing', navFor('pricing'))"
+              >
+                <span class="wc-ico">💰</span>
+                <div class="wc-name">Pricing</div>
+                <div class="wc-file">pricing.md</div>
+              </div>
+              <div
+                class="welcome-card"
+                onclick="loadMd('stack_tech', navFor('stack_tech'))"
+              >
+                <span class="wc-ico">⚙️</span>
+                <div class="wc-name">Tech Stack</div>
+                <div class="wc-file">stack_tech.md</div>
+              </div>
+            </div>
+
+            <div class="welcome-html-row">
+              <div
+                class="welcome-html-card"
+                onclick="window.open('one_page.html', '_blank')"
+              >
+                <span class="wc-ico">🗂️</span>
+                <div>
+                  <div class="wc-name">One Page Summary</div>
+                  <div class="wc-file">one_page.html</div>
+                </div>
+                <span class="wc-arrow">↗</span>
+              </div>
+              <div
+                class="welcome-html-card"
+                onclick="window.open('deck_presentation.html', '_blank')"
+              >
+                <span class="wc-ico">🎞️</span>
+                <div>
+                  <div class="wc-name">Presentation Deck</div>
+                  <div class="wc-file">deck_presentation.html</div>
+                </div>
+                <span class="wc-arrow">↗</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MD PAGES -->
+        <div class="content-area" id="page-proposal"></div>
+        <div class="content-area" id="page-sow"></div>
+        <div class="content-area" id="page-timeline"></div>
+        <div class="content-area" id="page-pricing"></div>
+        <div class="content-area" id="page-stack_tech"></div>
+      </main>
+    </div>
+
+    <script>
+      marked.setOptions({ breaks: true, gfm: true });
+
+      const FILES = {
+        proposal: "proposal.md",
+        sow: "sow.md",
+        timeline: "timeline.md",
+        pricing: "pricing.md",
+        stack_tech: "stack_tech.md",
+      };
+
+      const META = {
+        proposal: "Project Proposal",
+        sow: "Scope of Work",
+        timeline: "Timeline",
+        pricing: "Pricing Proposal",
+        stack_tech: "Tech Stack",
+      };
+
+      const cache = {};
+
+      function setNav(el) {
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        if (el) el.classList.add("active");
+      }
+
+      function showPage(id) {
+        document
+          .querySelectorAll(".content-area")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById("page-" + id).classList.add("active");
+        document.getElementById("main").scrollTop = 0;
+      }
+
+      function navFor(key) {
+        return document.querySelector(`.nav-item[data-key="${key}"]`);
+      }
+
+      function showWelcome(el) {
+        setNav(el);
+        showPage("welcome");
+      }
+
+      async function loadMd(key, navEl) {
+        setNav(navEl);
+        showPage(key);
+        const pageEl = document.getElementById("page-" + key);
+
+        if (cache[key]) {
+          pageEl.innerHTML = cache[key];
+          return;
+        }
+
+        pageEl.innerHTML =
+          '<div class="loading"><div class="spinner"></div> Loading…</div>';
+
+        try {
+          const res = await fetch(FILES[key]);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const raw = await res.text();
+          const html = `<div class="content-inner"><div class="md-body">${marked.parse(raw)}</div></div>`;
+          cache[key] = html;
+          pageEl.innerHTML = html;
+        } catch (e) {
+          pageEl.innerHTML = `
+        <div class="content-inner">
+          <div class="error-box">
+            <h3>⚠️ File tidak dapat dimuat</h3>
+            <p>Pastikan <code>${FILES[key]}</code> ada di folder yang sama dengan <code>index.html</code>.<br/>Error: <code>${e.message}</code></p>
+          </div>
+        </div>`;
+        }
+      }
+
+      // keyboard shortcut 0=home, 1–5=docs
+      const keyMap = {
+        1: "proposal",
+        2: "sow",
+        3: "timeline",
+        4: "pricing",
+        5: "stack_tech",
+      };
+      document.addEventListener("keydown", (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
+          return;
+        if (e.key === "0")
+          showWelcome(document.querySelector('[data-page="welcome"]'));
+        if (keyMap[e.key]) loadMd(keyMap[e.key], navFor(keyMap[e.key]));
+      });
+    </script>
+  </body>
+</html>
